@@ -52,7 +52,10 @@ namespace UniqueLootHelper
             
             foreach(var label in GameController.IngameState.IngameUi.ItemsOnGroundLabelsVisible)
             {
-                if(UniquesHashSet.Contains(label.ItemOnGround.GetComponent<WorldItem>()?.ItemEntity.GetComponent<RenderItem>()?.ResourcePath))
+                var modelPath = label.ItemOnGround.GetComponent<WorldItem>()?.ItemEntity.GetComponent<RenderItem>()?.ResourcePath;
+                if (modelPath == null) continue;
+                var trimmedPath = modelPath.Substring(0, modelPath.IndexOf("."));
+                if (UniquesHashSet.Contains(trimmedPath))
                 {
                     Graphics.DrawFrame(label.Label.GetClientRectCache, Settings.Color, Settings.FrameThickness);
                 }
