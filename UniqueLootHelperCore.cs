@@ -6,6 +6,8 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using ExileCore.Shared.Cache;
+using ExileCore.PoEMemory.Elements;
 
 namespace UniqueLootHelper
 {
@@ -13,20 +15,23 @@ namespace UniqueLootHelper
     {
         private const string UNIQUESARTWORK_FILE = "UniquesArtworks.txt";
         private HashSet<String> UniquesHashSet;
+        //private TimeCache<List<LabelOnGround>> CachedLabels { get; set; }
+        public List<SharpDX.RectangleF> drawingList = new List<SharpDX.RectangleF>();
 
         public override bool Initialise()
         {
             Name = "UniqueLootHelper";
             Settings.RefreshUniquesFile.OnPressed += () => { ReadUniquesArtworkFile(); };
             ReadUniquesArtworkFile();
-            return base.Initialise();
+            return true;
+            //CachedLabels = new TimeCache<List<LabelOnGround>>(UpdateLabelComponent, Settings.CacheIntervall);
         }
         private void ReadUniquesArtworkFile()
         {
             var path = $"{DirectoryFullName}\\{UNIQUESARTWORK_FILE}";
             if (File.Exists(path))
             {
-                UniquesHashSet = File.ReadAllLines(path).Where(line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith("#")).ToHashSet();
+                UniquesHashSet = File.ReadAllLines(path).Where(line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith("#")).ToList().Select(x => x + ".dds").ToHashSet();
             }
             else
                 CreateUniquesArtworkFile();
@@ -42,32 +47,44 @@ namespace UniqueLootHelper
                 streamWriter.Close();
             }
         }
+        //private List<LabelOnGround> UpdateLabelComponent() =>
+        //    GameController.Game.IngameState.IngameUi.ItemsOnGroundLabelsVisible
+        //    .Where(x =>
+        //        x.ItemOnGround.Type == ExileCore.Shared.Enums.EntityType.WorldItem &&
+        //        x.CanPickUp &&
+        //        x.ItemOnGround.GetComponent<WorldItem>()?.ItemEntity.GetComponent<Mods>()?.ItemRarity == ExileCore.Shared.Enums.ItemRarity.Unique &&
+        //        UniquesHashSet.Contains(x.ItemOnGround.GetComponent<WorldItem>()?.ItemEntity.GetComponent<RenderItem>()?.ResourcePath)).ToList();
         public override void Render()
         {
-            if(GameController.Area.CurrentArea.IsHideout ||
-                GameController.Area.CurrentArea.IsTown)
+            foreach (var frame in drawingList)
             {
-                return;
+                Graphics.DrawFrame(frame, Settings.Color, Settings.FrameThickness);
             }
-            
-            foreach(var label in GameController.IngameState.IngameUi.ItemsOnGroundLabelsVisible)
-            {
-                var modelPath = label.ItemOnGround.GetComponent<WorldItem>()?.ItemEntity.GetComponent<RenderItem>()?.ResourcePath;
-                if (modelPath == null) continue;
-                var trimmedPath = modelPath.Substring(0, modelPath.IndexOf("."));
-                if (UniquesHashSet.Contains(trimmedPath))
-                {
-                    Graphics.DrawFrame(label.Label.GetClientRectCache, Settings.Color, Settings.FrameThickness);
-                }
-            }
-            
-            base.Render();
         }
 
         public override Job Tick()
         {
-
-            return base.Tick();
+            drawingList.Clear();
+            if (GameController.Area.CurrentArea.IsHideout ||
+                GameController.Area.CurrentArea.IsTown)
+            {
+                return null;
+            }
+            foreach (var label in GameController.IngameState.IngameUi.ItemsOnGroundLabelsVisible)
+            {
+                var worlditem = label.ItemOnGround.GetComponent<WorldItem>();
+                if (worlditem == null) continue;
+                if (worlditem.ItemEntity.Type != ExileCore.Shared.Enums.EntityType.Item) continue;
+                var renderitem = worlditem.ItemEntity.GetComponent<RenderItem>();
+                if (renderitem == null) continue;
+                var modelPath = renderitem.ResourcePath;
+                if (modelPath == null) continue;
+                if (UniquesHashSet.Contains(modelPath))
+                {
+                    drawingList.Add(label.Label.GetClientRectCache);
+                }
+            }
+            return null;
         }
     }
 }
