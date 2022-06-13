@@ -14,8 +14,8 @@ namespace UniqueLootHelper
     public class UniqueLootHelperCore : BaseSettingsPlugin<Settings>
     {
         private const string UNIQUESARTWORK_FILE = "UniquesArtworks.txt";
-        private HashSet<String> UniquesHashSet;
-        //private TimeCache<List<LabelOnGround>> CachedLabels { get; set; }
+        private HashSet<string> UniquesHashSet;
+        
         public List<SharpDX.RectangleF> drawingList = new List<SharpDX.RectangleF>();
 
         public override bool Initialise()
@@ -23,8 +23,7 @@ namespace UniqueLootHelper
             Name = "UniqueLootHelper";
             Settings.RefreshUniquesFile.OnPressed += () => { ReadUniquesArtworkFile(); };
             ReadUniquesArtworkFile();
-            return true;
-            //CachedLabels = new TimeCache<List<LabelOnGround>>(UpdateLabelComponent, Settings.CacheIntervall);
+            return base.Initialise();
         }
         private void ReadUniquesArtworkFile()
         {
@@ -47,13 +46,6 @@ namespace UniqueLootHelper
                 streamWriter.Close();
             }
         }
-        //private List<LabelOnGround> UpdateLabelComponent() =>
-        //    GameController.Game.IngameState.IngameUi.ItemsOnGroundLabelsVisible
-        //    .Where(x =>
-        //        x.ItemOnGround.Type == ExileCore.Shared.Enums.EntityType.WorldItem &&
-        //        x.CanPickUp &&
-        //        x.ItemOnGround.GetComponent<WorldItem>()?.ItemEntity.GetComponent<Mods>()?.ItemRarity == ExileCore.Shared.Enums.ItemRarity.Unique &&
-        //        UniquesHashSet.Contains(x.ItemOnGround.GetComponent<WorldItem>()?.ItemEntity.GetComponent<RenderItem>()?.ResourcePath)).ToList();
         public override void Render()
         {
             foreach (var frame in drawingList)
