@@ -14,26 +14,30 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <BaseOutputPath>..\..\..\..\PoeHelper\Plugins\Compiled\UniqueLootHelper</BaseOutputPath>
+    <IsPublishable>False</IsPublishable>
+    <Nullable>warnings</Nullable>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <SignAssembly>False</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\..\PoeHelper\PrivateHud\Plugins\Compiled\UniqueLootHelper\</OutputPath>
+    <OutputPath>..\..\..\..\PoeHelper\Plugins\Compiled\UniqueLootHelper\</OutputPath>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ExileCore">
-      <HintPath>..\..\PrivateExileApi\PoeHelper\ExileCore.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SharpDX">
-      <HintPath>..\..\PrivateExileApi\PoeHelper\SharpDX.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SharpDX.Mathematics">
-      <HintPath>..\..\PrivateExileApi\PoeHelper\SharpDX.Mathematics.dll</HintPath>
+      <HintPath>..\..\..\..\PoeHelper\ExileCore.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.6.0-preview3.19128.7" />
+	<PackageReference Include="ImGui.NET" Version="1.87.3" />
+	<PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
+	<PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.18" />
   </ItemGroup>
 </Project>
